@@ -12,6 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World! This is a test</h1>
+        <h1>Hello World! This is a test QR</h1>
     </body>
 </html>
