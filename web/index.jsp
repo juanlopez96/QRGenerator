@@ -9,9 +9,15 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>QR Generator</title>
     </head>
     <body>
-        <h1>Hello World! This is a test QR</h1>
+        <h2>Registro para uso del parqueadero</h2>
+        <form method="post" action="autenticate.jsp">
+            <label>Número de identificación</label>
+            <input name="identificacion" type="number"/>
+            <input type ="submit" value="Ingresar"/>
+        </form>
+        
     </body>
 </html>
