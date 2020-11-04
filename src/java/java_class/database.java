@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -49,7 +50,7 @@ public final class database {
     }
 
     public person getPerson(String id) {
-        connect();
+        
         person p1 = null;
         try {
             String sql = "SELECT * FROM PERSONA WHERE ID_PERSONA = ?";
@@ -67,12 +68,12 @@ public final class database {
             System.out.println("Error when try to get person: " + e.getMessage());
             p1 = null;
         }
-        disconnect();
+       
         return p1;
     }
 
     public String getRol(String id) {
-        connect();
+        
         String rol = null;
         try {
             String sql = "SELECT NOMBRE_ROL FROM ROL "
@@ -89,12 +90,12 @@ public final class database {
             System.out.println("Cannot get rol " + e.getMessage());
             rol = null;
         }
-        disconnect();
+        
         return rol;
     }
 
     public Map getType() {
-        connect();
+        
         Map<String,String>vehicle_type = new HashMap();
         try {
             String sql = "SELECT * FROM TIPO";
@@ -107,7 +108,27 @@ public final class database {
         } catch (SQLException e) {
             System.out.println("Cannot get data from TIPO: " + e.getMessage());
         }
-        disconnect();
+      
         return vehicle_type;
+    }
+    public ArrayList getMarca(){
+        ArrayList<marca_vehiculo> marcas= new ArrayList();
+        try {
+            String sql = "SELECT * FROM MARCA";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                marca_vehiculo aux = new marca_vehiculo();
+                aux.setId_marca(rs.getString(1));
+                aux.setId_tipo(rs.getString(2));
+                aux.setNombre_marca(rs.getString(3));
+                marcas.add(aux);
+            }
+            System.out.println(marcas.size());
+        } catch (SQLException e) {
+            System.out.println("Cannot get data from MARCA: " + e.getMessage());
+        }
+      
+        return marcas;
     }
 }
