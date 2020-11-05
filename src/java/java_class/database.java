@@ -124,7 +124,7 @@ public final class database {
                 aux.setNombre_marca(rs.getString(3));
                 marcas.add(aux);
             }
-            System.out.println(marcas.size());
+            
         } catch (SQLException e) {
             System.out.println("Cannot get data from MARCA: " + e.getMessage());
         }
