@@ -131,4 +131,19 @@ public final class database {
       
         return marcas;
     }
+    
+    public ArrayList<String> id_person(){
+        ArrayList<String> ids = new ArrayList<>();
+        try{
+            String sql = "SELECT ID_PERSONA FROM PERSONA";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                ids.add(rs.getString(1));
+            }
+        }catch(Exception e){
+            System.out.println("Cannnot get all users " + e.getMessage());
+        }
+        return ids;
+    }
 }

@@ -7,9 +7,8 @@
 function enableforms(){
     vehicle_info = document.getElementById("vehicle_info");
     vehicle_info.style.display="block";
+    content_authorization = document.getElementById("content_authorization");
+    content_authorization.style.display="block";
 }
-function enable_authorization(){
-    authorization = document.getElementById("authorization");
-    authorization.style.display="block";
-}
+
 

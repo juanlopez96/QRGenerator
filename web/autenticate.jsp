@@ -19,6 +19,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Registro</title>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/autenticate_page.js"></script>
+        <script rel="stylesheet" src="${pageContext.request.contextPath}/css/style.css"></script>
     </head>
     <body>
         <h1>Universidad de Cundinamarca</h1>
@@ -32,6 +33,7 @@
             String name = "";
             String last_name = "";
             String rol = "";
+            ArrayList<String> ids = db.id_person();
             person p1 = db.getPerson(id);
             Map vehicle_type = db.getType();
             ArrayList<marca_vehiculo> marcas = db.getMarca();
@@ -91,15 +93,21 @@
             </div>
 
         </form>
-        <div>
-            <textarea name="info_autorizados" rows="4" cols="50">Si desea autorizar a terceros para el ingreso y salida de este vehículo, de clic en el boton autorizar a terceros</textarea>
-            <p><button onclick="enable_authorization()">Autorizar a terceros</button></p>
-            <form id="authorization">
+        <div id="content_authorization">
+            <textarea name="info_autorizados" rows="4" cols="50">Si desea autorizar a terceros para el ingreso y salida de este vehículo, ingrese el número de documento de la persona y de clic en añadir usuario</textarea>
+
+            <form id="authorization" class="authorization">
                 <label>Documento de identidad:</label>
-                <input type="number"/>
-                <button onclick="add_user()">Añadir usuario</button>
-                
+                <input id="newID" type="number" required/>
+
+                <table id="table_user">
+                    <tr>
+                        <th>Documento</th>
+                    </tr>
+                </table>
+
             </form>
+            <p><button onclick="validate_authorization()">Añadir usuario</button></p>
         </div>        
         <%
         } else {
@@ -112,7 +120,8 @@
 
 <script>
     document.getElementById("vehicle_info").style.display = "none";
-    document.getElementById("authorization").style.display = "none";
+    document.getElementById("content_authorization").style.display = "none";
+
     var select = document.getElementById("modelo");
     for (i = 1990; i <= new Date().getFullYear() + 1; i++) {
         var opt = document.createElement('option');
@@ -150,5 +159,52 @@
         });
 
     }
+    function validate_authorization() {
+        var newID = document.getElementById("newID");
+        var table = document.getElementById("table_user");
+        var users = [];
+        if (newID.value.length !== 0) {
+            console.log(newID.value);
+    <%for (String user : ids) {%>
+            users.push("<%=user%>");
+    <%
+        }%>
+            if (newID.value !== "<%=id%>") {
+
+                var exist = false;
+                var exist2 = false;
+                users.forEach(element => {
+                    if (element === newID.value.toString()) {
+                        exist = true;
+                    }
+                });
+                for (var i = 0, row; row = table.rows[i]; i++) {
+                    if (table.rows[i].cells[0].innerHTML.toString() === newID.value.toString()) {
+                        exist2 = true;
+                    }
+                }
+                if (!exist) {
+                    /**/
+                    alert("El usuario ingresado no hace parte de la Universidad de Cundinamarca");
+
+                } else {
+                    if (!exist2) {
+                        console.log("Agregar");
+
+                        var newRow = table.insertRow(-1);
+                        var newCell = newRow.insertCell(-1);
+                        newCell.innerHTML = newID.value;
+                    }
+                    else{
+                        alert("El usuario ya se encuentra añadido a la lista");
+                    }
+                }
+            } else {
+                alert("No puede añadirse a si mismo como autorizado");
+            }
+        }
+
+    }
+
 
 </script>
