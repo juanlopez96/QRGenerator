@@ -188,7 +188,7 @@
 </html>
 
 <script>
-
+    var authorized_users = [];
     var placa = document.getElementById("placa");
     placa.setAttribute("readonly", "readonly");
     document.getElementById("vehicle_info").style.display = "none";
@@ -302,8 +302,8 @@
                         exist = true;
                     }
                 });
-                for (var i = 0, row; row = table.rows[i]; i++) {
-                    if (table.rows[i].cells[0].innerHTML.toString() === newID.value.toString()) {
+                for (var i = 0; i<authorized_users.length;i++) {
+                    if (authorized_users[i].toString() === newID.value.toString()) {
                         exist2 = true;
                     }
                 }
@@ -318,7 +318,9 @@
                         var newRow = table.insertRow(-1);
                         var newCell = newRow.insertCell(-1);
                         newCell.innerHTML = newID.value;
+                        authorized_users.push(newID.value);
                         newID.value = "";
+                        
                     } else {
                         alert("El usuario ya se encuentra añadido a la lista");
                     }
@@ -342,12 +344,8 @@
         if (placa.value !== "" && tipo.value > '0' && marca.value > '0' && modelo.value !== "" && color.value !== "") {
             validate1 = true;
             var table = document.getElementById("table_user");
-            for (var i = 1, row; row = table.rows[i]; i++) {
-                if (table.rows[i].cells[0].toString() !== "") {
-                    autorizados.push(table.rows[i].cells[0].innerHTML.toString());
-                    //SAVE TO SEND TO THE DB
-                }
-            }
+            autorizados = authorized_users;
+            
 
             document.getElementById("all_authorized_users").value = autorizados;
             console.log(document.getElementById("all_authorized_users").value);
