@@ -4,6 +4,8 @@
     Author     : Juan
 --%>
 
+<%@page import="java_class.persona_vehiculo"%>
+<%@page import="java_class.vehicle"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java_class.marca_vehiculo"%>
 <%@page import="java.util.Iterator"%>
@@ -37,7 +39,8 @@
             person p1 = db.getPerson(id);
             Map vehicle_type = db.getType();
             ArrayList<marca_vehiculo> marcas = db.getMarca();
-
+            ArrayList<vehicle> myvehicles = db.getMyVehicle(id);
+            ArrayList<persona_vehiculo> authorizedUser = db.getAuthorizedUser(id);
             if (p1 != null) {
                 name = p1.getName();
                 last_name = p1.getLastName();
@@ -55,11 +58,11 @@
         <input readonly value="<%=rol%>"/>
         <br>
         <p><button onclick="enableforms()">Registrar vehículo</button></p>
-        <form id="vehicle_info" >
+        <form id="vehicle_info" action="upload_data.jsp" method="post">
             <div>
                 <label>Tipo:</label>
                 <select id="tipo" name="tipo" onchange="setType()">
-                    <option disabled selected></option>
+                    <option disabled selected value=""></option>
                     <%
                         Iterator iterator = vehicle_type.entrySet().iterator();
                         while (iterator.hasNext()) {
@@ -73,24 +76,26 @@
                         }
                     %>
                 </select>
-                <label>Placa:</label>
-                <input id="placa" type="text" min="4" max="6" name="placa" onkeypress ="return checkinput(document.getElementById('placa'))" readonly=""/>
-                
-                <label>Marca:</label>
-                <select name="marca" id="marca">
-                    <option disabled selected></option>
-                </select>
-                <label>Modelo:</label>
-                <select name="modelo" id="modelo">
-                    <option disabled selected></option>
+                <p><label>Placa:</label>
+                    <input id="placa" type="text" min="4" max="6" name="placa" onkeypress ="return checkinput(document.getElementById('placa'))" readonly=""/></p>
 
-                </select>
-                <label>Color:</label>
-                <select name="color" id="color">
-                    <option disabled selected></option>
-                    <option value="Negro">Negro</option>
-                </select>
-                <!-- lista de vehiculos ingresados -->
+                <p><label>Marca:</label>
+                    <select name="marca" id="marca">
+                        <option disabled selected value=""></option>
+                    </select></p>
+                <p><label>Modelo:</label>
+                    <select name="modelo" id="modelo">
+                        <option disabled selected value=""></option>
+
+                    </select></p>
+                <p><label>Color:</label>
+                    <select name="color" id="color">
+                        <option disabled selected value=""></option>
+                        <option value="Negro">Negro</option>
+                    </select></p>
+                <p><label>Si considera necesario, añada una descipción acerca de su vehículo</label></p>
+                <p><textarea name="descripcion" rows="4" cols="50" placeholder="Ejemplo: Linea: Spark... Tiene un número en el capó"></textarea></p>
+                <input type="hidden" name="all_authorized_users" id="all_authorized_users"/>
             </div>
 
         </form>
@@ -101,7 +106,7 @@
                 <label>Documento de identidad:</label>
                 <input id="newID" type="number" onkeydown="search()" required/>
 
-                <table id="table_user">
+                <table id="table_user" name="table_user">
                     <tr>
                         <th>Documento</th>
                     </tr>
@@ -109,8 +114,70 @@
 
             </div>
             <p><button onclick="validate_authorization()">Añadir usuario</button></p>
-            <p><button onclick="add_vehicle()">Añadir vehiculo</button></p>
-        </div>        
+
+        </div>   
+        <div>
+            <%if (myvehicles.size() > 0) {%>
+            <table id="table_vehicle">
+
+                <tr>
+                    <th>Placa</th>
+                    <th>Tipo</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Color</th>
+                    <th>Desctipción</th>
+                </tr>
+                
+                <%
+                    for (vehicle x : myvehicles) {%>
+                    <tr>
+                <td><%=x.getPlaca_vehiculo() %> </td>
+                <%Iterator iterator2 = vehicle_type.entrySet().iterator();
+                    while (iterator2.hasNext()) {
+                        Map.Entry entry = (Map.Entry) iterator2.next();
+                        if (entry.getKey().equals(x.getId_tipo())) {%>
+                <td><%=entry.getValue() %></td>
+                <%}
+                    }
+                    for (marca_vehiculo marca : marcas) {
+                        if (marca.getId_marca().equals(x.getId_marca())) {%>
+                        <td><%=marca.getNombre_marca()%></td>
+                        <%}
+                        
+                    }
+
+                %>
+                <td><%=x.getModelo_vehiculo() %></td>
+                <td><%=x.getColor_vehiculo() %></td>
+                <td><%=x.getDescripcion_vehiculo()%></td>
+                </tr>
+                <%}%>
+                
+            </table>
+                <%}%>
+        </div>
+        <div>
+            <%if(authorizedUser.size()>0){ %>
+            <table id="authorized_vehicle">
+                <tr>
+                    <th>Placa</th>
+                    
+                </tr>
+                <%for(persona_vehiculo x : authorizedUser){%>
+                    <tr>
+                        <td>
+                            <%=x.getPlaca_vehiculo()%>
+                        </td>
+                        
+                    </tr>
+                <%}%>
+            </table>
+            <%}%>
+        </div>
+
+        <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()">Añadir vehiculo</button></p>
+
         <%
         } else {
         %>No se encontro el usuario<%
@@ -121,6 +188,7 @@
 </html>
 
 <script>
+
     var placa = document.getElementById("placa");
     placa.setAttribute("readonly", "readonly");
     document.getElementById("vehicle_info").style.display = "none";
@@ -201,8 +269,7 @@
                         } else {
                             return false;
                         }
-                    }
-                    else{
+                    } else {
                         if ((x > 47 && x < 58)) {
                             return false;
                         } else {
@@ -211,7 +278,7 @@
                     }
                 }
             }
-        }else{
+        } else {
             return false;
         }
     };
@@ -262,7 +329,9 @@
         }
 
     }
+
     function add_vehicle() {
+
         var placa = document.getElementById("placa");
         var tipo = document.getElementById("tipo");
         var marca = document.getElementById("marca");
@@ -270,7 +339,27 @@
         var color = document.getElementById("color");
         var autorizados = [];
         var validate1 = false;
-        
+        if (placa.value !== "" && tipo.value > '0' && marca.value > '0' && modelo.value !== "" && color.value !== "") {
+            validate1 = true;
+            var table = document.getElementById("table_user");
+            for (var i = 1, row; row = table.rows[i]; i++) {
+                if (table.rows[i].cells[0].toString() !== "") {
+                    autorizados.push(table.rows[i].cells[0].innerHTML.toString());
+                    //SAVE TO SEND TO THE DB
+                }
+            }
+
+            document.getElementById("all_authorized_users").value = autorizados;
+            console.log(document.getElementById("all_authorized_users").value);
+        }
+
+        if (validate1) {
+            return true;
+        } else {
+            alert("Faltan campos por completar");
+            return false;
+        }
+
     }
 
 
