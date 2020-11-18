@@ -40,6 +40,7 @@
             database db = new database();
             db.connect();
             db.insertVehicle(veh, authorized);
+            db.disconnect();
         %>
         
     </body>

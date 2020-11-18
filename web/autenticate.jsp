@@ -4,6 +4,8 @@
     Author     : Juan
 --%>
 
+<%@page import="java.awt.image.BufferedImage"%>
+<%@page import="java_class.qrgenerator"%>
 <%@page import="java_class.persona_vehiculo"%>
 <%@page import="java_class.vehicle"%>
 <%@page import="java.util.ArrayList"%>
@@ -21,7 +23,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Registro</title>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/autenticate_page.js"></script>
-        <script rel="stylesheet" src="${pageContext.request.contextPath}/css/style.css"></script>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
     </head>
     <body>
         <h1>Universidad de Cundinamarca</h1>
@@ -41,6 +43,9 @@
             ArrayList<marca_vehiculo> marcas = db.getMarca();
             ArrayList<vehicle> myvehicles = db.getMyVehicle(id);
             ArrayList<persona_vehiculo> authorizedUser = db.getAuthorizedUser(id);
+            ArrayList<String> getAllVehicle = db.getAllVehicles();
+            qrgenerator qr = new qrgenerator();
+            BufferedImage image = qr.createQR(id);
             if (p1 != null) {
                 name = p1.getName();
                 last_name = p1.getLastName();
@@ -77,7 +82,7 @@
                     %>
                 </select>
                 <p><label>Placa:</label>
-                    <input id="placa" type="text" min="4" max="6" name="placa" onkeypress ="return checkinput(document.getElementById('placa'))" readonly=""/></p>
+                    <input id="placa" type="text" min="4" max="6" name="placa" onfocusout="verifyIfExist()" onkeypress ="return checkinput(document.getElementById('placa'))" readonly=""/></p>
 
                 <p><label>Marca:</label>
                     <select name="marca" id="marca">
@@ -100,7 +105,7 @@
 
         </form>
         <div id="content_authorization">
-            <textarea name="info_autorizados" rows="4" cols="50">Si desea autorizar a terceros para el ingreso y salida de este vehículo, ingrese el número de documento de la persona y de clic en añadir usuario</textarea>
+            <textarea name="info_autorizados" rows="4" cols="50" readonly>Si desea autorizar a terceros para el ingreso y salida de este vehículo, ingrese el número de documento de la persona y de clic en añadir usuario</textarea>
 
             <div id="authorization" class="authorization">
                 <label>Documento de identidad:</label>
@@ -128,56 +133,65 @@
                     <th>Color</th>
                     <th>Desctipción</th>
                 </tr>
-                
+
                 <%
                     for (vehicle x : myvehicles) {%>
-                    <tr>
-                <td><%=x.getPlaca_vehiculo() %> </td>
-                <%Iterator iterator2 = vehicle_type.entrySet().iterator();
-                    while (iterator2.hasNext()) {
-                        Map.Entry entry = (Map.Entry) iterator2.next();
-                        if (entry.getKey().equals(x.getId_tipo())) {%>
-                <td><%=entry.getValue() %></td>
-                <%}
-                    }
-                    for (marca_vehiculo marca : marcas) {
-                        if (marca.getId_marca().equals(x.getId_marca())) {%>
-                        <td><%=marca.getNombre_marca()%></td>
-                        <%}
-                        
-                    }
+                <tr>
+                    <td><%=x.getPlaca_vehiculo()%> </td>
+                    <%Iterator iterator2 = vehicle_type.entrySet().iterator();
+                        while (iterator2.hasNext()) {
+                            Map.Entry entry = (Map.Entry) iterator2.next();
+                            if (entry.getKey().equals(x.getId_tipo())) {%>
+                    <td><%=entry.getValue()%></td>
+                    <%}
+                        }
+                        for (marca_vehiculo marca : marcas) {
+                            if (marca.getId_marca().equals(x.getId_marca())) {%>
+                    <td><%=marca.getNombre_marca()%></td>
+                    <%}
 
-                %>
-                <td><%=x.getModelo_vehiculo() %></td>
-                <td><%=x.getColor_vehiculo() %></td>
-                <td><%=x.getDescripcion_vehiculo()%></td>
+                        }
+
+                    %>
+                    <td><%=x.getModelo_vehiculo()%></td>
+                    <td><%=x.getColor_vehiculo()%></td>
+                    <td><%=x.getDescripcion_vehiculo()%></td>
                 </tr>
                 <%}%>
-                
+
             </table>
-                <%}%>
+            <%}%>
         </div>
         <div>
-            <%if(authorizedUser.size()>0){ %>
+            <%if (authorizedUser.size() > 0) { %>
             <table id="authorized_vehicle">
                 <tr>
                     <th>Placa</th>
-                    
+
                 </tr>
-                <%for(persona_vehiculo x : authorizedUser){%>
-                    <tr>
-                        <td>
-                            <%=x.getPlaca_vehiculo()%>
-                        </td>
-                        
-                    </tr>
+                <%for (persona_vehiculo x : authorizedUser) {%>
+                <tr>
+                    <td>
+                        <%=x.getPlaca_vehiculo()%>
+                    </td>
+
+                </tr>
                 <%}%>
             </table>
             <%}%>
         </div>
 
         <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()">Añadir vehiculo</button></p>
-
+        <p><button onclick="generarQR()">Generar código QR</button>
+        <div id="popup" class="overlay">
+            <div id="popupBody">
+                <h2>Código QR</h2>
+                <a id="cerrar" href="#">&times;</a>
+                <div class="popupContent" id="popupContent">
+                    <input type="button" value="print" onclick="imprimir()"/>
+                </div>
+            </div>
+        </div>
         <%
         } else {
         %>No se encontro el usuario<%
@@ -188,6 +202,7 @@
 </html>
 
 <script>
+    var overlay = document.getElementById("popup");
     var authorized_users = [];
     var placa = document.getElementById("placa");
     placa.setAttribute("readonly", "readonly");
@@ -237,6 +252,20 @@
             validate_authorization();
         }
 
+    }
+    function verifyIfExist() {
+        var allvehicles = []
+    <%for (String x : getAllVehicle) {
+    %>
+        allvehicles.push("<%=x%>");
+    <%} %>
+        console.log(allvehicles);
+        for (var i = 0; i < allvehicles.length; i++) {
+            if (allvehicles[i] === placa_input.value) {
+                alert("El vehículo de placas " + placa_input.value + " ya existe en el sistema");
+                placa_input.value = "";
+            }
+        }
     }
     placa_input.onkeyup = function () {
         this.value = this.value.toUpperCase();
@@ -302,7 +331,7 @@
                         exist = true;
                     }
                 });
-                for (var i = 0; i<authorized_users.length;i++) {
+                for (var i = 0; i < authorized_users.length; i++) {
                     if (authorized_users[i].toString() === newID.value.toString()) {
                         exist2 = true;
                     }
@@ -320,7 +349,7 @@
                         newCell.innerHTML = newID.value;
                         authorized_users.push(newID.value);
                         newID.value = "";
-                        
+
                     } else {
                         alert("El usuario ya se encuentra añadido a la lista");
                     }
@@ -345,7 +374,7 @@
             validate1 = true;
             var table = document.getElementById("table_user");
             autorizados = authorized_users;
-            
+
 
             document.getElementById("all_authorized_users").value = autorizados;
             console.log(document.getElementById("all_authorized_users").value);
@@ -360,5 +389,39 @@
 
     }
 
+    function generarQR() {
+        var myvehicles = false;
+        var authorized = false;
+    <%if (myvehicles.size() > 0) {%>
+        myvehicles = true;
+    <%}%>
 
+    <%if (authorizedUser.size() > 0) {%>
+        authorized = true;
+    <%}%>
+
+        if (myvehicles || authorized) {
+            var image = document.createElement("img");
+            image.setAttribute("id","qrcode");
+            image.setAttribute("src", "<%=qr.convertToBase64(image)%>");
+            image.setAttribute("width", "300");
+            image.setAttribute("height", "300");
+            document.getElementById("popupContent").appendChild(image);
+            
+            overlay.style.display ="block";
+            
+        }
+    }
+    function imprimir(){
+    var image = document.getElementById("qrcode");
+        printw = window.open("","_blank");
+        printw.document.write("<html>");
+        printw.document.write("<body><img src='");
+        printw.document.write(image.src);
+        printw.document.write("'/></body></html>");
+        printw.document.close();
+        printw.print();
+        printw.close();
+        
+    }
 </script>

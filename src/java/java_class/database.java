@@ -250,5 +250,20 @@ public final class database {
         }
         return authorizedUser;
     }
+    
+    public ArrayList<String> getAllVehicles(){
+        ArrayList<String> placas = new ArrayList<>();
+        try{
+            String sql = "SELECT PERSONA_VEHICULO.PLACA_VEHICULO FROM PERSONA_VEHICULO";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                placas.add(rs.getString(1));
+            }
+        }catch(SQLException e){
+            System.out.println("Error al consultar las placas registradas "+ e.getMessage());
+        }
+        return placas;
+    }
             
 }
