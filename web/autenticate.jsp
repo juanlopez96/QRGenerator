@@ -69,7 +69,7 @@
             </div>
         </div>
   
-        <a href="" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white" style="background: #00482b ; color: #ffffff">Cerrar sesión</a>
+        <a  onclick="cerrarSesion()" class="w3-bar-item w3-button w3-hover-white" style="background: #00482b ; color: #ffffff">Cerrar sesión</a>
   </div>
 </nav>
 
@@ -212,9 +212,9 @@
                 </p>
             </div>
                 
-            <p><button type="submit" form="vehicle_info" onclick="validate_authorization()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Añadir usuario &nbsp; </button></p>
+            <p><input type="button" onclick="validate_authorization()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff" value="Añadir usuario "><i class="fa fa-save"/></i></p>
             <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Guardar &nbsp; </button></p>
-            <p><button type="button" class="w3-btn w3-padding w3-light-gray w3-center" ><i class="fa fa-refresh"></i>&nbsp; Refrescar</button></p>
+            <p><button class="w3-btn w3-padding w3-light-gray w3-center" ><i class="fa fa-refresh"></i>&nbsp; Refrescar</button></p>
         </form>
       </div>
     </div>
@@ -252,6 +252,9 @@
         opt.innerHTML = i;
         select.appendChild(opt);
     }
+    function preventBack() { window.history.forward(); }  
+    setTimeout("preventBack()", 0);  
+    window.onunload = function () { null };
     function setType() {
         placa.removeAttribute("readonly");
         type = document.getElementById("tipo").value;

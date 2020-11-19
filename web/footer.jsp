@@ -16,7 +16,7 @@
 
     function cerrarSesion() {
         w3_close();
-        history.forward();
+        window.history.forward();
         window.location = "./logout.jsp";
     }
 
