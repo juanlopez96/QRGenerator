@@ -15,10 +15,18 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java_class.person"%>
 <%@page import="java_class.database"%>
-<jsp:include page="head.jsp" />
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/autenticate_page.js"></script>
-
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Registro</title>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/autenticate_page.js"></script>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
+    </head>
+    <body>
+        <h1>Universidad de Cundinamarca</h1>
         <%
             database db = new database();
             db.connect();
@@ -45,114 +53,20 @@
                 db.disconnect();
         %>
 
-<nav class="w3-sidebar w3-white w3-collapse w3-large w3-padding-24" style="z-index:0;width:300px;font-weight:bold; background:#4d4d4d;  border-right-color:#4d4d4d" id="mySidebar"><br>
-  <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft" style="width:100%;font-size:22px">Close Menu</a>
-  <div class="w3-bar-block" style="    padding-top: 40px">
-    <div class="w3-container w3-padding">
-      <p>
-        <input readonly value="<%=p1.getName()%>" style="border: 0"/>
-        <input readonly value="<%=p1.getLastName()%>" style="border: 0"/>
-      </p>
-      <p>
-        <input readonly value="<%=p1.getId()%>" style="border: 0"/>
-      </p>
-      <p>
-        <input readonly value="<%=rol%>" style="border: 0"/>
-      </p> 
-    </div>
-      <button onclick="generarQR()" class="w3-bar-item w3-button w3-hover-white" style="background: #00482b; color: #ffffff" disabled id="generarPrint">Generar código QR</button>
-        <div id="popup" class="overlay">
-            <div id="popupBody">
-                <div class="popupContent" id="popupContent">
-                    <input type="button" value="Imprimir QR" onclick="imprimir()" class="w3-bar-item w3-button w3-hover-white" style="background: #00482b; color: #ffffff" disabled id="print"/>
-                </div>
-            </div>
-        </div>
-  
-        <a href="" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white" style="background: #00482b ; color: #ffffff">Cerrar sesión</a>
-  </div>
-</nav>
-
-<header class="w3-container w3-top w3-hide-large w3-xlarge w3-padding" style="background:#4d4d4d">
-  <img class="w3-left" src="img/logo-nuevo-70.png">
-  <a href="https://www.ucundinamarca.edu.co/" class="w3-right" style="line-height: 50px; font-style:italic; color: #ffffff; font-size: 15px; text-decoration:none">  Ir a UCundinamarca</a>
-  <div class="w3-container"
-    <a href="javascript:void(0)" class="w3-button w3-margin-right" onclick="w3_open()" style="background:#4d4d4d; color: #ffffff">&#9776;</a>
-  </div>
-</header>
-
-<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
-
-<!-- !PAGE CONTENT! -->
-<div class="w3-main" style="margin-left:340px;margin-right:40px">
-
-  <!-- Header -->
-  <div class="w3-container w3-padding-24" style="margin-top:80px" id="showcase">
-    <h1 class="w3-jumbo"><b>Hola, Bienvenid@</b></h1>
-    <h1 class="w3-xxxlarge" style="color: #00482b"><b>Listado de vehículos</b></h1>
-    <hr style="width:50px;border:5px solid; color: #00482b" class="w3-round">
-  </div>
-
-  <!-- Listado de usuarios -->
-  <div class="w3-container" id="services" style="margin-top:10px; display: inline">
-
-
-    <div class="w3-row">
-      <div class="w3-light-grey w3-container w3-twothird" style="display: table">
-        <%if ((myvehicles.size() >= 0)|| (authorizedUser.size() > 0)) {%>
-        <table class="w3-table w3-striped">
-          <tr>
-            <th></th>
-            <th>Placa o N° de registro</th>
-            <th>Tipo</th>
-            <th>Marca</th>
-            <th>Modelo</th>
-            <th>Color</th>
-            <th>Descripción</th>
-          </tr>
-          <%for (vehicle x : myvehicles) {%>
-          <tr>
-            <td><i class="fa fa-edit"></i></td>
-            <td><%=x.getPlaca_vehiculo()%></td>
-            <%Iterator iterator2 = vehicle_type.entrySet().iterator();
-                while (iterator2.hasNext()) {
-                    Map.Entry entry = (Map.Entry) iterator2.next();
-                        if (entry.getKey().equals(x.getId_tipo())) {%>
-            <td><%=entry.getValue()%></td>
-            <%          }
-                }
-                for (marca_vehiculo marca : marcas) {
-                    if (marca.getId_marca().equals(x.getId_marca())) {%>
-            <td><%=marca.getNombre_marca()%></td>
-            <%      }
-                }
-            %>
-            <td><%=x.getModelo_vehiculo()%></td>
-            <td><%=x.getColor_vehiculo()%></td>
-            <td><%=x.getDescripcion_vehiculo()%></td>
-          </tr>
-          <%}%>
-        <%}%>
-            <%for (persona_vehiculo x : authorizedUser) {%>
-            <tr>
-                <td><i class="fa fa-eye"></i></td>
-                <td>
-                    <%=x.getPlaca_vehiculo()%>
-                </td>
-            </tr>
-            <%}%>
-        </table>
-    </div>
-      
-      <div class="w3-container w3-third" onload="enableforms()">
-        <div class="w3-container" style=" background:#00482b; display: flex">
-          <h2 style="color: #ffffff">Vehículo</h2>
-        </div>
-          <form class="w3-container w3-card-4" id="vehicle_info" action="upload_data.jsp" method="post" >
-            <br>
-            <p>      
-                <label class="w3-text-grey">Tipo</label>
-                <select class="w3-input w3-border" id="tipo" name="tipo" onchange="setType()">
+        <label>Documento de identidad:</label>
+        <input readonly value="<%=p1.getId()%>"/>
+        <label>Nombre:</label>
+        <input readonly value="<%=p1.getName()%>"/>
+        <label>Apellido:</label>
+        <input readonly value="<%=p1.getLastName()%>"/>
+        <label>Rol:</label>
+        <input readonly value="<%=rol%>"/>
+        <br>
+        <p><button onclick="enableforms()">Registrar vehÃ­culo</button></p>
+        <form id="vehicle_info" action="upload_data.jsp" method="post">
+            <div>
+                <label>Tipo:</label>
+                <select id="tipo" name="tipo" onchange="setType()">
                     <option disabled selected value=""></option>
                     <%
                         Iterator iterator = vehicle_type.entrySet().iterator();
@@ -167,83 +81,133 @@
                         }
                     %>
                 </select>
-            </p>
-            <p>      
-                <label class="w3-text-grey">Placa o N° de registro</label>
-                <!--<input type="text">-->
-                 <input id="placa" class="w3-input w3-border" type="text" min="4" max="6" name="placa" onfocusout="verifyIfExist()" onkeypress ="return checkinput(document.getElementById('placa'))" readonly="" />
+                <p><label>Placa:</label>
+                    <input id="placa" type="text" min="4" max="6" name="placa" onfocusout="verifyIfExist()" onkeypress ="return checkinput(document.getElementById('placa'))" readonly=""/></p>
 
-            </p>
-            <p>      
-                <label class="w3-text-grey">Marca</label>
-                <select class="w3-input w3-border" name="marca" id="marca">
-                    <option disabled selected value=""></option>
-                </select>
-            </p>
-            <p>      
-            <label class="w3-text-grey">Modelo</label>
-             <select class="w3-input w3-border" name="modelo" id="modelo">
-                <option selected value=""></option>
-            </select>
-            </p>
-            <p>      
-            <label class="w3-text-grey">Color</label>
-            <select class="w3-input w3-border" name="color" id="color">
-                <option selected value=""></option>
-                <option value="Negro">Negro</option>
-            </select>
-            </p>
-            <p>      
-                <label class="w3-text-grey">Si considera necesario, añada una descipción acerca de su vehículo</label>
-                <textarea name="descripcion" rows="4" cols="50" placeholder="Ejemplo: Linea: Spark... Tiene un número en el capó" style="width: 100%"></textarea>
+                <p><label>Marca:</label>
+                    <select name="marca" id="marca">
+                        <option disabled selected value=""></option>
+                    </select></p>
+                <p><label>Modelo:</label>
+                    <select name="modelo" id="modelo">
+                        <option disabled selected value=""></option>
+
+                    </select></p>
+                <p><label>Color:</label>
+                    <select name="color" id="color">
+                        <option disabled selected value=""></option>
+                        <option value="Negro">Negro</option>
+                    </select></p>
+                <p><label>Si considera necesario, aÃ±ada una descipciÃ³n acerca de su vehÃ­culo</label></p>
+                <p><textarea name="descripcion" rows="4" cols="50" placeholder="Ejemplo: Linea: Spark... Tiene un nÃºmero en el capÃ³"></textarea></p>
                 <input type="hidden" name="all_authorized_users" id="all_authorized_users"/>
-            <div id="content_authorization">
-                <label class="w3-text-grey" name="info_autorizados">Si desea autorizar a terceros para el ingreso y salida de este vehículo, ingrese el número de documento de la persona y de clic en añadir usuario</label>
-                
-                <p id="authorization" class="authorization">   
-                    <label class="w3-text-grey">Documento de identidad</label>
-                    <input class="w3-input w3-border" id="newID" type="number" onkeydown="search()" />
-                    <table id="table_user" name="table_user">
-                        <tr>
-                            <td><i class="fa fa-edit"></i></td>
-                            <th>Documento</th>
-                        </tr>
-                    </table>
-                </p>
             </div>
-                
-            <p><button type="submit" form="vehicle_info" onclick="validate_authorization()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Añadir usuario &nbsp; </button></p>
-            <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Guardar &nbsp; </button></p>
-            <p><button type="button" class="w3-btn w3-padding w3-light-gray w3-center" ><i class="fa fa-refresh"></i>&nbsp; Refrescar</button></p>
+
         </form>
-      </div>
-    </div>
-  </div>
-  
+        <div id="content_authorization">
+            <textarea name="info_autorizados" rows="4" cols="50" readonly>Si desea autorizar a terceros para el ingreso y salida de este vehÃ­culo, ingrese el nÃºmero de documento de la persona y de clic en aÃ±adir usuario</textarea>
 
-<!-- End page content -->
-</div>    
-      
-<%} else {%>
-    <div class="w3-content" style="min-height: 100%">
-         <div class="w3-container w3-padding-24" style="margin-top:80px" id="showcase">
-            <h1 class="w3-xxxlarge w3-center" style="color: #00482b"><b>No se encontró al usuario</b></h1>
-         </div>
-    </div>
-<%}%>        
+            <div id="authorization" class="authorization">
+                <label>Documento de identidad:</label>
+                <input id="newID" type="number" onkeydown="search()" required/>
 
-<jsp:include page="footer.jsp" />
+                <table id="table_user" name="table_user">
+                    <tr>
+                        <th>Documento</th>
+                    </tr>
+                </table>
+
+            </div>
+            <p><button onclick="validate_authorization()">AÃ±adir usuario</button></p>
+
+        </div>   
+        <div>
+            <%if (myvehicles.size() > 0) {%>
+            <table id="table_vehicle">
+
+                <tr>
+                    <th>Placa</th>
+                    <th>Tipo</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Color</th>
+                    <th>DesctipciÃ³n</th>
+                </tr>
+
+                <%
+                    for (vehicle x : myvehicles) {%>
+                <tr>
+                    <td><%=x.getPlaca_vehiculo()%> </td>
+                    <%Iterator iterator2 = vehicle_type.entrySet().iterator();
+                        while (iterator2.hasNext()) {
+                            Map.Entry entry = (Map.Entry) iterator2.next();
+                            if (entry.getKey().equals(x.getId_tipo())) {%>
+                    <td><%=entry.getValue()%></td>
+                    <%}
+                        }
+                        for (marca_vehiculo marca : marcas) {
+                            if (marca.getId_marca().equals(x.getId_marca())) {%>
+                    <td><%=marca.getNombre_marca()%></td>
+                    <%}
+
+                        }
+
+                    %>
+                    <td><%=x.getModelo_vehiculo()%></td>
+                    <td><%=x.getColor_vehiculo()%></td>
+                    <td><%=x.getDescripcion_vehiculo()%></td>
+                </tr>
+                <%}%>
+
+            </table>
+            <%}%>
+        </div>
+        <div>
+            <%if (authorizedUser.size() > 0) { %>
+            <table id="authorized_vehicle">
+                <tr>
+                    <th>Placa</th>
+
+                </tr>
+                <%for (persona_vehiculo x : authorizedUser) {%>
+                <tr>
+                    <td>
+                        <%=x.getPlaca_vehiculo()%>
+                    </td>
+
+                </tr>
+                <%}%>
+            </table>
+            <%}%>
+        </div>
+
+        <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()">AÃ±adir vehiculo</button></p>
+        <p><button onclick="generarQR()">Generar cÃ³digo QR</button>
+        <div id="popup" class="overlay">
+            <div id="popupBody">
+                <h2>CÃ³digo QR</h2>
+                <a id="cerrar" href="#">&times;</a>
+                <div class="popupContent" id="popupContent">
+                    <input type="button" value="imprimir" onclick="imprimir()"/>
+                </div>
+            </div>
+        </div>
+        <%
+        } else {
+        %>No se encontro el usuario<%
+            }
+        %>
+
+    </body>
+</html>
 
 <script>
     var overlay = document.getElementById("popup");
     var authorized_users = [];
-    var printI = document.getElementById("print");
-    var generatePrint = document.getElementById("generarPrint");
-    generatePrint.disabled = false;
     var placa = document.getElementById("placa");
     placa.setAttribute("readonly", "readonly");
-    //document.getElementById("vehicle_info").style.display = "none";
-    //document.getElementById("content_authorization").style.display = "none";
+    document.getElementById("vehicle_info").style.display = "none";
+    document.getElementById("content_authorization").style.display = "none";
     var placa_input = document.getElementById("placa");
     var select = document.getElementById("modelo");
     for (i = 1990; i <= new Date().getFullYear() + 1; i++) {
@@ -290,7 +254,7 @@
 
     }
     function verifyIfExist() {
-        var allvehicles = [];
+        var allvehicles = []
     <%for (String x : getAllVehicle) {
     %>
         allvehicles.push("<%=x%>");
@@ -298,7 +262,7 @@
         console.log(allvehicles);
         for (var i = 0; i < allvehicles.length; i++) {
             if (allvehicles[i] === placa_input.value) {
-                alert("El vehículo de placas " + placa_input.value + " ya existe en el sistema");
+                alert("El vehÃ­culo de placas " + placa_input.value + " ya existe en el sistema");
                 placa_input.value = "";
             }
         }
@@ -387,11 +351,11 @@
                         newID.value = "";
 
                     } else {
-                        alert("El usuario ya se encuentra añadido a la lista");
+                        alert("El usuario ya se encuentra aÃ±adido a la lista");
                     }
                 }
             } else {
-                alert("No puede añadirse a si mismo como autorizado");
+                alert("No puede aÃ±adirse a si mismo como autorizado");
             }
         }
 
@@ -424,12 +388,10 @@
         }
 
     }
-    
+
     function generarQR() {
         var myvehicles = false;
         var authorized = false;
-        generatePrint.disabled = true;
-        printI.disabled=false;
     <%if (myvehicles.size() > 0) {%>
         myvehicles = true;
     <%}%>
