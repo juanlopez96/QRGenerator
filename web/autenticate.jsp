@@ -104,6 +104,7 @@
                 <table class="w3-table w3-striped">
                     <tr>
                         <th></th>
+                        <th></th>
                         <th>Placa o N° de registro</th>
                         <th>Tipo</th>
                         <th>Marca</th>
@@ -114,6 +115,7 @@
                     <%for (vehicle x : myvehicles) {%>
                     <tr>
                         <td onclick="vehiculoSeleccionado(<%=x.getId_tipo()%>, '<%=x.getPlaca_vehiculo()%>', '<%=x.getId_marca()%>', '<%=x.getModelo_vehiculo()%>', '<%=x.getColor_vehiculo()%>', '<%=x.getDescripcion_vehiculo()%>');"><i class="fa fa-edit"></i></td>
+                        <td onclick="delete_vehicle"><i class="fa fa-trash-o"></i></td>
                         <td><%=x.getPlaca_vehiculo()%></td>
                         <%Iterator iterator2 = vehicle_type.entrySet().iterator();
                             while (iterator2.hasNext()) {
@@ -137,6 +139,7 @@
                     <%for (persona_vehiculo x : authorizedUser) {%>
                     <tr>
                         <td><i class="fa fa-eye"></i></td>
+                        <td></td>
                         <td>
                             <%=x.getPlaca_vehiculo()%>
                         </td>
@@ -149,72 +152,77 @@
                 <div class="w3-container" style=" background:#00482b; display: flex">
                     <h2 style="color: #ffffff">Vehículo</h2>
                 </div>
-                <form class="w3-container w3-card-4" id="vehicle_info" action="upload_data.jsp" method="post" >
-                    <br>
-                    <p>      
-                        <label class="w3-text-grey">Tipo</label>
-                        <select class="w3-input w3-border" id="tipo" name="tipo" onchange="setType()">
-                            <option disabled selected value=""></option>
-                            <%
-                                Iterator iterator = vehicle_type.entrySet().iterator();
-                                while (iterator.hasNext()) {
-                                    Map.Entry entry = (Map.Entry) iterator.next();
-                                    if (entry.getKey().equals(request.getParameter("type"))) {%>
-                            <option value="<%=entry.getKey()%>" selected><%=entry.getValue()%></option>
-                            <%} else {%>
-                            <option value="<%=entry.getKey()%>"><%=entry.getValue()%></option>
-                            <%}
+                <div class="w3-container w3-card-4" >
+                    <form id="vehicle_info" action="upload_data.jsp" method="post" >
+                        <br>
+                        <p>      
+                            <label class="w3-text-grey">Tipo</label>
+                            <select class="w3-input w3-border" id="tipo" name="tipo" onchange="setType()">
+                                <option disabled selected value=""></option>
+                                <%
+                                    Iterator iterator = vehicle_type.entrySet().iterator();
+                                    while (iterator.hasNext()) {
+                                        Map.Entry entry = (Map.Entry) iterator.next();
+                                        if (entry.getKey().equals(request.getParameter("type"))) {%>
+                                <option value="<%=entry.getKey()%>" selected><%=entry.getValue()%></option>
+                                <%} else {%>
+                                <option value="<%=entry.getKey()%>"><%=entry.getValue()%></option>
+                                <%}
 
-                                }
-                            %>
-                        </select>
-                    </p>
-                    <p>      
-                        <label class="w3-text-grey">Placa o N° de registro</label>
-                        <!--<input type="text">-->
-                        <input id="placa" class="w3-input w3-border" type="text" min="4" max="6" name="placa" onfocusout="verifyIfExist()" onkeypress ="return checkinput(document.getElementById('placa'))" readonly="" />
-
-                    </p>
-                    <p>      
-                        <label class="w3-text-grey">Marca</label>
-                        <select class="w3-input w3-border" name="marca" id="marca">
-                            <option disabled selected value=""></option>
-                        </select>
-                    </p>
-                    <p>      
-                        <label class="w3-text-grey">Modelo</label>
-                        <select class="w3-input w3-border" name="modelo" id="modelo">
-                            <option selected value=""></option>
-                        </select>
-                    </p>
-                    <p>      
-                        <label class="w3-text-grey">Color</label>
-                        <select class="w3-input w3-border" name="color" id="color">
-                            <option selected value=""></option>
-                            <option value="Negro">Negro</option>
-                        </select>
-                    </p>
-                    <p>      
-                        <label class="w3-text-grey">Si considera necesario, añada una descipción acerca de su vehículo</label>
-                        <textarea id="descripcion" name="descripcion" rows="4" cols="50" placeholder="Ejemplo: Linea: Spark... Tiene un número en el capó" style="width: 100%"></textarea>
-                        <input type="hidden" name="all_authorized_users" id="all_authorized_users"/>
-                    <div id="content_authorization">
-                        <label class="w3-text-grey" name="info_autorizados">Si desea autorizar a terceros para el ingreso y salida de este vehículo, ingrese el número de documento de la persona y de clic en añadir usuario</label>
-
-                        <p id="authorization" class="authorization">   
-                            <label class="w3-text-grey">Documento de identidad</label>
-                            <input class="w3-input w3-border" id="newID" type="number" onkeydown="search()" />
-                        <lablel>Documento</lablel>   
-                        <table id="table_user" name="table_user">
-                            
-                        </table>
+                                    }
+                                %>
+                            </select>
                         </p>
-                    </div>
+                        <p>      
+                            <label class="w3-text-grey">Placa o N° de registro</label>
+                            <!--<input type="text">-->
+                            <input id="placa" class="w3-input w3-border" type="text" min="4" max="6" name="placa" onfocusout="verifyIfExist()" onkeypress ="return checkinput(document.getElementById('placa'))" readonly="" />
 
-                    <div class="w3-btn w3-padding w3-center" style="background:#00482b" ><input type="button" onclick="validate_authorization()" style="background:#00482b; color: #ffffff" value="Añadir usuario "><i class="fa fa-save"/></i></div>
-                    <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Guardar &nbsp; </button></p>
-                    <p><button class="w3-btn w3-padding w3-light-gray w3-center" ><i class="fa fa-refresh"></i>&nbsp; Refrescar</button></p>
-                </form>
+                        </p>
+                        <p>      
+                            <label class="w3-text-grey">Marca</label>
+                            <select class="w3-input w3-border" name="marca" id="marca">
+                                <option disabled selected value=""></option>
+                            </select>
+                        </p>
+                        <p>      
+                            <label class="w3-text-grey">Modelo</label>
+                            <select class="w3-input w3-border" name="modelo" id="modelo">
+                                <option selected value=""></option>
+                            </select>
+                        </p>
+                        <p>      
+                            <label class="w3-text-grey">Color</label>
+                            <select class="w3-input w3-border" name="color" id="color">
+                                <option selected value=""></option>
+                                <option value="Negro">Negro</option>
+                            </select>
+                        </p>
+                        <p>      
+                            <label class="w3-text-grey">Si considera necesario, añada una descipción acerca de su vehículo</label>
+                            <textarea id="descripcion" name="descripcion" rows="4" cols="50" placeholder="Ejemplo: Linea: Spark... Tiene un número en el capó" style="width: 100%"></textarea>
+                            <input type="hidden" name="all_authorized_users" id="all_authorized_users"/>
+                        <div id="content_authorization">
+                            <label class="w3-text-grey" name="info_autorizados">Si desea autorizar a terceros para el ingreso y salida de este vehículo, ingrese el número de documento de la persona y de clic en añadir usuario</label>
+
+                            <p id="authorization" class="authorization">   
+                                <label class="w3-text-grey">Documento de identidad</label>
+                                <input class="w3-input w3-border" id="newID" type="number" onkeydown="search()" />
+                            <lablel>Documento</lablel>   
+                            <table id="table_user" name="table_user">
+
+                            </table>
+                            </p>
+                        </div>
+
+                        <div class="w3-btn w3-padding w3-center" style="background:#00482b; padding: 7px 20px!important;" >
+                            <i class="fa fa-user-plus" style="color: #ffffff""/></i>
+                        <input type="button" onclick="validate_authorization()" style="background:#00482b; color: #ffffff; border: 0; outline: none;" value="Añadir">
+                        </div>
+                        <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Guardar &nbsp; </button></p>
+                    </form>
+                    <p><button class="w3-btn w3-padding w3-light-gray w3-center" onclick="refrescar();"><i class="fa fa-refresh"></i>&nbsp; Refrescar</button></p>
+                </div>
             </div>
         </div>
     </div>
@@ -430,7 +438,11 @@
         }
 
     }
-
+    
+    function delete_vehicle() {
+        
+    }
+    
     function vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV) {
         authorized_users = [];
         document.getElementById('vehicle_info').reset();
@@ -471,10 +483,14 @@
             for (var i = 0; i < showAllAuthoByPlaca.length; i++) {
                 var newRow = table.insertRow(-1);
                 var newCell = newRow.insertCell(-1);
-                newCell.innerHTML = showAllAuthoByPlaca[i] +"<td><i class='fa fa-trash-o'></i></td>" ;
+                newCell.innerHTML = showAllAuthoByPlaca[i] +"  <td><i class='fa fa-trash-o'></i></td>" ;
                 authorized_users.push(showAllAuthoByPlaca[i]);
             }
         }
+    }
+    
+    function refrescar() {
+        window.open("autenticate.jsp", "_self");
     }
 
     function generarQR() {
