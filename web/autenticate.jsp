@@ -35,6 +35,7 @@
     ArrayList<marca_vehiculo> marcas = db.getMarca();
     ArrayList<vehicle> myvehicles = db.getMyVehicle(id);
     ArrayList<persona_vehiculo> authorizedUser = db.getAuthorizedUser(id);
+    ArrayList<persona_vehiculo> allPersonAuthorized = db.getAllAthorized();
     ArrayList<String> getAllVehicle = db.getAllVehicles();
     qrgenerator qr = new qrgenerator();
     BufferedImage image = qr.createQR(id);
@@ -117,7 +118,7 @@
                         <%Iterator iterator2 = vehicle_type.entrySet().iterator();
                             while (iterator2.hasNext()) {
                                 Map.Entry entry = (Map.Entry) iterator2.next();
-                    if (entry.getKey().equals(x.getId_tipo())) {%>
+                                if (entry.getKey().equals(x.getId_tipo())) {%>
                         <td><%=entry.getValue()%></td>
                         <%          }
                             }
@@ -203,10 +204,9 @@
                         <p id="authorization" class="authorization">   
                             <label class="w3-text-grey">Documento de identidad</label>
                             <input class="w3-input w3-border" id="newID" type="number" onkeydown="search()" />
+                        <lablel>Documento</lablel>   
                         <table id="table_user" name="table_user">
-                            <tr>
-                                <th>Documento</th>
-                            </tr>
+                            
                         </table>
                         </p>
                     </div>
@@ -430,9 +430,9 @@
         }
 
     }
-    
-    function vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV) {
 
+    function vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV) {
+        authorized_users = [];
         document.getElementById('vehicle_info').reset();
 
         document.getElementById("tipo").readOnly = true;
@@ -447,9 +447,34 @@
         document.getElementById("color").value = '' + colorV;
         document.getElementById("descripcion").value = '' + descripcionV;
         //Revisar
-        <%for (persona_vehiculo x : authorizedUser) {%>
-                document.getElementById("table_user").value = '' + <%=x.getId_persona()%>;
-        <%}%> 
+        var all_autho = [];
+        var showAllAuthoByPlaca = [];
+    <%for (persona_vehiculo x : allPersonAuthorized) {%>
+        all_autho.push("<%=x.getId_persona()%>" + "-" + "<%=x.getPlaca_vehiculo()%>" + "-" + "<%=x.getPropietario()%>");
+    <%
+        }%>
+
+
+        for (var i = 0; i < all_autho.length; i++) {
+
+            var spl = all_autho[i].split("-");
+            if (spl[1] === placaV && spl[2] === '0') {
+                showAllAuthoByPlaca.push(spl[0]);
+                console.log(spl[0]);
+            }
+        }
+        var table = document.getElementById("table_user");
+        for(var i = 0; i<table.rows.length;i++){
+            table.deleteRow(i);
+        }
+        if (showAllAuthoByPlaca.length > 0) {
+            for (var i = 0; i < showAllAuthoByPlaca.length; i++) {
+                var newRow = table.insertRow(-1);
+                var newCell = newRow.insertCell(-1);
+                newCell.innerHTML = showAllAuthoByPlaca[i] +"<td><i class='fa fa-trash-o'></i></td>" ;
+                authorized_users.push(showAllAuthoByPlaca[i]);
+            }
+        }
     }
 
     function generarQR() {

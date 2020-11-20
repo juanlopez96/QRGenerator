@@ -265,5 +265,25 @@ public final class database {
         }
         return placas;
     }
+    
+    public ArrayList<persona_vehiculo> getAllAthorized(){
+        ArrayList<persona_vehiculo> ids = new ArrayList();
+        
+        try{
+            String sql = "SELECT * FROM PERSONA_VEHICULO";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                persona_vehiculo aux = new persona_vehiculo();
+                aux.setId_persona(rs.getString(1));
+                aux.setPlaca_vehiculo(rs.getString(2));
+                aux.setPropietario(rs.getInt(3));
+                ids.add(aux);
+            }
+        }catch(Exception e){
+            System.out.println("Hubo un error al consultar las personas que autoricé en mi vehiculo " + e.getMessage());
+        }
+        return ids;
+    } 
             
 }
