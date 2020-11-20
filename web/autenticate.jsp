@@ -112,7 +112,7 @@
                     </tr>
                     <%for (vehicle x : myvehicles) {%>
                     <tr>
-                        <td><i class="fa fa-edit"></i></td>
+                        <td onclick="vehiculoSeleccionado(<%=x.getId_tipo()%>, '<%=x.getPlaca_vehiculo()%>', '<%=x.getId_marca()%>', '<%=x.getModelo_vehiculo()%>', '<%=x.getColor_vehiculo()%>', '<%=x.getDescripcion_vehiculo()%>');"><i class="fa fa-edit"></i></td>
                         <td><%=x.getPlaca_vehiculo()%></td>
                         <%Iterator iterator2 = vehicle_type.entrySet().iterator();
                             while (iterator2.hasNext()) {
@@ -195,7 +195,7 @@
                     </p>
                     <p>      
                         <label class="w3-text-grey">Si considera necesario, añada una descipción acerca de su vehículo</label>
-                        <textarea name="descripcion" rows="4" cols="50" placeholder="Ejemplo: Linea: Spark... Tiene un número en el capó" style="width: 100%"></textarea>
+                        <textarea id="descripcion" name="descripcion" rows="4" cols="50" placeholder="Ejemplo: Linea: Spark... Tiene un número en el capó" style="width: 100%"></textarea>
                         <input type="hidden" name="all_authorized_users" id="all_authorized_users"/>
                     <div id="content_authorization">
                         <label class="w3-text-grey" name="info_autorizados">Si desea autorizar a terceros para el ingreso y salida de este vehículo, ingrese el número de documento de la persona y de clic en añadir usuario</label>
@@ -205,14 +205,13 @@
                             <input class="w3-input w3-border" id="newID" type="number" onkeydown="search()" />
                         <table id="table_user" name="table_user">
                             <tr>
-                                <td><i class="fa fa-edit"></i></td>
                                 <th>Documento</th>
                             </tr>
                         </table>
                         </p>
                     </div>
 
-                    <p><input type="button" onclick="validate_authorization()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff" value="Añadir usuario "><i class="fa fa-save"/></i></p>
+                    <div class="w3-btn w3-padding w3-center" style="background:#00482b" ><input type="button" onclick="validate_authorization()" style="background:#00482b; color: #ffffff" value="Añadir usuario "><i class="fa fa-save"/></i></div>
                     <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Guardar &nbsp; </button></p>
                     <p><button class="w3-btn w3-padding w3-light-gray w3-center" ><i class="fa fa-refresh"></i>&nbsp; Refrescar</button></p>
                 </form>
@@ -389,7 +388,7 @@
 
                         var newRow = table.insertRow(-1);
                         var newCell = newRow.insertCell(-1);
-                        newCell.innerHTML = newID.value;
+                        newCell.innerHTML = newID.value + "  <td><i class='fa fa-trash-o'></i></td>";
                         authorized_users.push(newID.value);
                         newID.value = "";
 
@@ -430,6 +429,27 @@
             return false;
         }
 
+    }
+    
+    function vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV) {
+
+        document.getElementById('vehicle_info').reset();
+
+        document.getElementById("tipo").readOnly = true;
+        document.getElementById("placa").readOnly = true;
+
+        document.getElementById("tipo").value = '' + tipoV;
+        document.getElementById("placa").value = '' + placaV;
+        console.log(marcaV);
+        setType();
+        document.getElementById("marca").value = '' + marcaV;
+        document.getElementById("modelo").value = '' + modeloV;
+        document.getElementById("color").value = '' + colorV;
+        document.getElementById("descripcion").value = '' + descripcionV;
+        //Revisar
+        <%for (persona_vehiculo x : authorizedUser) {%>
+                document.getElementById("table_user").value = '' + <%=x.getId_persona()%>;
+        <%}%> 
     }
 
     function generarQR() {
