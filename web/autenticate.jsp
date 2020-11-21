@@ -315,18 +315,21 @@
 
     }
     function verifyIfExist() {
-        var allvehicles = [];
+        if (document.getElementById("crud").value !== '2') {
+            var allvehicles = [];
     <%for (String x : getAllVehicle) {
     %>
-        allvehicles.push("<%=x%>");
+            allvehicles.push("<%=x%>");
     <%} %>
-        console.log(allvehicles);
-        for (var i = 0; i < allvehicles.length; i++) {
-            if (allvehicles[i] === placa_input.value) {
-                alert("El vehículo de placas " + placa_input.value + " ya existe en el sistema");
-                placa_input.value = "";
+            console.log(allvehicles);
+            for (var i = 0; i < allvehicles.length; i++) {
+                if (allvehicles[i] === placa_input.value) {
+                    alert("El vehículo de placas " + placa_input.value + " ya existe en el sistema");
+                    placa_input.value = "";
+                }
             }
         }
+
     }
     placa_input.onkeyup = function () {
         this.value = this.value.toUpperCase();
@@ -423,12 +426,13 @@
     }
 
     function add_vehicle() {
-
+        
         var placa = document.getElementById("placa");
         var tipo = document.getElementById("tipo");
         var marca = document.getElementById("marca");
         var modelo = document.getElementById("modelo");
         var color = document.getElementById("color");
+        tipo.removeAttribute("disabled");
         var autorizados = [];
         var validate1 = false;
         if (placa.value !== "" && tipo.value > '0' && marca.value > '0' && modelo.value !== "" && color.value !== "") {
@@ -449,38 +453,37 @@
         }
 
     }
-    
-    function delete_vehicle( placaV) {
+
+    function delete_vehicle(placaV) {
         //vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV);
         placa_aux = placaV;
         document.getElementById("modalEliminar").style.display = "block";
         console.log(placa_aux);
 
     }
-    function confirm_delete(){
+    function confirm_delete() {
         console.log("test");
-        location.href="upload_data.jsp?data="+placa_aux;
+        location.href = "upload_data.jsp?data=" + placa_aux;
     }
-    function closemodal(){
+    function closemodal() {
         document.getElementById("modalEliminar").style.display = "none";
     }
-    window.onclick = function (event){
-        if(event.target===document.getElementById("modalEliminar")){
+    window.onclick = function (event) {
+        if (event.target === document.getElementById("modalEliminar")) {
             closemodal();
         }
     }
+
     function vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV) {
         document.getElementById("crud").value = "2";
         authorized_users = [];
         document.getElementById('vehicle_info').reset();
-
-        document.getElementById("tipo").readOnly = true;
-        document.getElementById("placa").readOnly = true;
-
         document.getElementById("tipo").value = '' + tipoV;
         document.getElementById("placa").value = '' + placaV;
         console.log(marcaV);
         setType();
+        placa_input.setAttribute("readonly","true");
+        document.getElementById("tipo").setAttribute("disabled","true");
         document.getElementById("marca").value = '' + marcaV;
         document.getElementById("modelo").value = '' + modeloV;
         document.getElementById("color").value = '' + colorV;
@@ -515,7 +518,7 @@
             }
         }
     }
-    
+
     function refrescar() {
         window.open("autenticate.jsp", "_self");
     }

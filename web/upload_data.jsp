@@ -52,19 +52,19 @@
                 if (request.getParameter("crud").equals("1")) {
                     System.out.println("1");
                     if (db.insertVehicle(veh, authorized)) {
-        %> <script>alert("Se ha añadido un vehículo correctamente" + "<%=request.getParameter("crud")%>");</script><%
+        %> <script>alert("Se ha añadido un vehículo correctamente");</script><%
             out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
         } else {
-        %> <script>alert("Ha ocurrido un error" + "<%=request.getParameter("crud")%>");</script><%
+        %> <script>alert("Ha ocurrido un error al insertar" );</script><%
                 out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
             }
         } else if (request.getParameter("crud").equals("2")) {
         %> <script>alert("Modificar");</script><%
             if (db.updateVehicle(veh, authorized)) {
-        %> <script>alert("Se ha añadido un vehículo correctamente" + "<%=request.getParameter("crud")%>");</script><%
+        %> <script>alert("Se ha modificado un vehículo correctamente" );</script><%
             out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
         } else {
-        %> <script>alert("Ha ocurrido un error" + "<%=request.getParameter("crud")%>");</script><%
+        %> <script>alert("Ha ocurrido un error al modificar");</script><%
                 out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
             }
 

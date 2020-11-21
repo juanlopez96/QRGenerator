@@ -5,6 +5,7 @@
  */
 package java_class;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -99,7 +100,7 @@ public final class database {
 
         Map<String, String> vehicle_type = new HashMap();
         try {
-            String sql = "SELECT * FROM TIPO";
+            String sql = "SELECT * FROM getType";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -116,7 +117,7 @@ public final class database {
     public ArrayList getMarca() {
         ArrayList<marca_vehiculo> marcas = new ArrayList();
         try {
-            String sql = "SELECT * FROM MARCA";
+            String sql = "SELECT * FROM getAllMarcas";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -137,7 +138,7 @@ public final class database {
     public ArrayList<String> id_person() {
         ArrayList<String> ids = new ArrayList<>();
         try {
-            String sql = "SELECT ID_PERSONA FROM PERSONA";
+            String sql = "SELECT * from getAllID";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -149,11 +150,11 @@ public final class database {
         return ids;
     }
 
-    public ArrayList<persona_vehiculo> getVehicleByPersonId(String id_person) {
+    /*public ArrayList<persona_vehiculo> getVehicleByPersonId(String id_person) {
         ArrayList<persona_vehiculo> per_veh = new ArrayList<>();
 
         try {
-            String sql = "SELECT * FROM PERSONA_VEHICULO WHERE ID_PERSONA = ?";
+            String sql = "exec getvehiclebypersonid(?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, id_person);
             ResultSet rs = ps.executeQuery();
@@ -168,14 +169,14 @@ public final class database {
             System.out.println("Error consultado persona_vehiculo " + e.getMessage());
         }
         return per_veh;
-    }
+    }*/
 
     public boolean insertVehicle(vehicle veh, ArrayList<persona_vehiculo> autorized) {
         boolean insertVehicle = true;
         boolean insertPersona_vehiculo = true;
         try {
-            String sql = "INSERT INTO VEHICULO VALUES (?,?,?,?,?,?)";
-            PreparedStatement ps = con.prepareStatement(sql);
+            String sql = "{ call insertVehicle (?,?,?,?,?,?)}";
+            CallableStatement ps = con.prepareCall(sql);
             ps.setString(1, crypto.encrypt(veh.getPlaca_vehiculo()));
             ps.setString(2, veh.getId_marca());
             ps.setString(3, veh.getId_tipo());
@@ -185,9 +186,9 @@ public final class database {
             ps.executeUpdate();
             if (autorized.size() > 0) {
                 for (persona_vehiculo x : autorized) {
-                    String sql2 = "INSERT INTO PERSONA_VEHICULO VALUES (?,?,?)";
+                    String sql2 = "{call insertPersonaVehiculo (?,?,?)}";
                     try {
-                        PreparedStatement ps2 = con.prepareStatement(sql2);
+                        CallableStatement ps2 = con.prepareCall(sql2);
                         ps2.setString(1, x.getId_persona());
                         ps2.setString(2, crypto.encrypt(x.getPlaca_vehiculo()));
                         ps2.setInt(3, x.getPropietario());
@@ -255,7 +256,7 @@ public final class database {
     public ArrayList<String> getAllVehicles() {
         ArrayList<String> placas = new ArrayList<>();
         try {
-            String sql = "SELECT PERSONA_VEHICULO.PLACA_VEHICULO FROM PERSONA_VEHICULO";
+            String sql = "SELECT * FROM getallvehicles";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -271,7 +272,7 @@ public final class database {
         ArrayList<persona_vehiculo> ids = new ArrayList();
 
         try {
-            String sql = "SELECT * FROM PERSONA_VEHICULO";
+            String sql = "SELECT * FROM getAllAtuhorized";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -291,9 +292,10 @@ public final class database {
         boolean update1 = false;
         boolean update2 = false;
         try {
-            String sql = "UPDATE VEHICULO SET ID_MARCA = ?, MODELO_VEHICULO=?, COLOR_VEHICULO=?, DESCRIPCION_VEHICULO = ?"
-                    + " WHERE PLACA_VEHICULO = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            //String sql = "UPDATE VEHICULO SET ID_MARCA = ?, MODELO_VEHICULO=?, COLOR_VEHICULO=?, DESCRIPCION_VEHICULO = ?"
+                  //  + " WHERE PLACA_VEHICULO = ?";
+                  String sql = "{call updateVehicle(?,?,?,?,?)}";
+            CallableStatement ps = con.prepareCall(sql);
             ps.setString(1, veh.getId_marca());
             ps.setString(2, veh.getModelo_vehiculo());
             ps.setString(3, veh.getColor_vehiculo());
@@ -303,17 +305,18 @@ public final class database {
             if (res1 == 1) {
                 update1 = true;
             }
-            sql = "DELETE PERSONA_VEHICULO WHERE PLACA_VEHICULO = ? AND PROPIETARIO = 0";
+            /*sql = "DELETE PERSONA_VEHICULO WHERE PLACA_VEHICULO = ? AND PROPIETARIO = 0";
             ps = con.prepareStatement(sql);
             ps.setString(1, crypto.encrypt(veh.getPlaca_vehiculo()));
-            ps.executeUpdate();
+            ps.executeUpdate();*/
             int res3 = 0;
             if (autorized.size() > 1) {
                 for (persona_vehiculo x : autorized) {
-                    String sql2 = "INSERT INTO PERSONA_VEHICULO VALUES (?,?,?)";
+                    //String sql2 = "INSERT INTO PERSONA_VEHICULO VALUES (?,?,?)";
+                    String sql2 = "{call insertPersonaVehiculo(?,?,?)}";
                     try {
                         if (x.getPropietario() == 0) {
-                            PreparedStatement ps2 = con.prepareStatement(sql2);
+                            CallableStatement ps2 = con.prepareCall(sql2);
                             ps2.setString(1, x.getId_persona());
                             ps2.setString(2, crypto.encrypt(x.getPlaca_vehiculo()));
                             ps2.setInt(3, x.getPropietario());
@@ -339,13 +342,9 @@ public final class database {
     }
 
     public boolean deleteVehicle(String placa) {
-        String sql = "DELETE PERSONA_VEHICULO WHERE PLACA_VEHICULO = ?";
+        String sql = "{call deleteVehicle(?)}";
         try{
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, crypto.encrypt(placa));
-            ps.executeQuery();
-            sql = "DELETE VEHICULO WHERE PLACA_VEHICULO=?";
-            ps = con.prepareStatement(sql);
+            CallableStatement ps = con.prepareCall(sql);
             ps.setString(1, crypto.encrypt(placa));
             ps.executeQuery();
             return true;
