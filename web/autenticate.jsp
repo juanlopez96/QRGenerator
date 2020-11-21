@@ -227,12 +227,16 @@
         </div>
     </div>
 
-    <div id="modalEliminar" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closemodal()">&times;</span>
-            <p>¿Está seguro de eliminar este vehículo?</p>
-            <input type="button" onclick="confirm_delete()" value="Confirmar"/>
-            <input type="button" onclick="closemodal()" value="Cancelar"/>
+    <div id="modalEliminar" class="w3-modal">
+        <div class="w3-modal-content">
+            <span class="close-modal w3-button" style="background:#00482b" onclick="closemodal()">&times;</span>
+            <div class="w3-container" style="background: #00482b"> </div>
+            <div class="w3-container" style="padding-bottom: 10px">
+                <h2>¿Está seguro de eliminar éste vehículo?</h2>
+                <input class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff" type="button" onclick="confirm_delete()" value="Confirmar"/>
+                <input class="w3-btn w3-padding w3-center" style="background: #4d4d4d; color: #ffffff" type="button" onclick="closemodal()" value="Cancelar"/>
+                <div></div>
+            </div>
         </div>
     </div>
     <!-- End page content -->
@@ -403,7 +407,7 @@
 
                         var newRow = table.insertRow(-1);
                         var newCell = newRow.insertCell(-1);
-                        newCell.innerHTML = newID.value + "  <td> <i class='fa fa-trash-o'></i></td>";
+                        newCell.innerHTML = newID.value + "  <td> <i onclick='deleteAutho(this)' class='fa fa-trash-o'></i></td>";
                         authorized_users.push(newID.value);
                         newID.value = "";
 
