@@ -403,7 +403,7 @@
 
                         var newRow = table.insertRow(-1);
                         var newCell = newRow.insertCell(-1);
-                        newCell.innerHTML = newID.value + "  <td><i class='fa fa-trash-o'></i></td>";
+                        newCell.innerHTML = newID.value + "  <td> <i class='fa fa-trash-o'></i></td>";
                         authorized_users.push(newID.value);
                         newID.value = "";
 
@@ -506,7 +506,7 @@
             for (var i = 0; i < showAllAuthoByPlaca.length; i++) {
                 var newRow = table.insertRow(-1);
                 var newCell = newRow.insertCell(-1);
-                newCell.innerHTML = showAllAuthoByPlaca[i] + "<td><i onclick='deleteAutho(this)' class='fa fa-trash-o'></i></td>";
+                newCell.innerHTML = showAllAuthoByPlaca[i] + "<td>  <i onclick='deleteAutho(this)' class='fa fa-trash-o'></i></td>";
                 authorized_users.push(showAllAuthoByPlaca[i]);
             }
         }
