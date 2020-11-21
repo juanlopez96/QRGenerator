@@ -25,6 +25,7 @@ public final class database {
     final private String url = "jdbc:oracle:thin:@localhost:1521:xe";
     final private String user = "system";
     final private String password = "123";
+    final private encryption crypto = new encryption();
     Connection con;
 
     //CONVERT TO FUNCTION AND CALL IT IN THE CONSTRUCTOR
@@ -159,7 +160,7 @@ public final class database {
             while (rs.next()) {
                 persona_vehiculo aux = new persona_vehiculo();
                 aux.setId_persona(rs.getString(1));
-                aux.setPlaca_vehiculo(rs.getString(2));
+                aux.setPlaca_vehiculo(crypto.decrypt(rs.getString(2)));
                 aux.setPropietario(rs.getInt(3));
                 per_veh.add(aux);
             }
@@ -175,7 +176,7 @@ public final class database {
         try {
             String sql = "INSERT INTO VEHICULO VALUES (?,?,?,?,?,?)";
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, veh.getPlaca_vehiculo());
+            ps.setString(1, crypto.encrypt(veh.getPlaca_vehiculo()));
             ps.setString(2, veh.getId_marca());
             ps.setString(3, veh.getId_tipo());
             ps.setString(4, veh.getModelo_vehiculo());
@@ -188,7 +189,7 @@ public final class database {
                     try {
                         PreparedStatement ps2 = con.prepareStatement(sql2);
                         ps2.setString(1, x.getId_persona());
-                        ps2.setString(2, x.getPlaca_vehiculo());
+                        ps2.setString(2, crypto.encrypt(x.getPlaca_vehiculo()));
                         ps2.setInt(3, x.getPropietario());
                         ps2.executeUpdate();
                     } catch (SQLException e) {
@@ -217,7 +218,7 @@ public final class database {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 vehicle aux = new vehicle();
-                aux.setPlaca_vehiculo(rs.getString(1));
+                aux.setPlaca_vehiculo(crypto.decrypt(rs.getString(1)));
                 aux.setId_marca(rs.getString(2));
                 aux.setId_tipo(rs.getString(3));
                 aux.setModelo_vehiculo(rs.getString(4));
@@ -241,7 +242,7 @@ public final class database {
             while (rs.next()) {
                 persona_vehiculo aux = new persona_vehiculo();
                 aux.setId_persona(rs.getString(1));
-                aux.setPlaca_vehiculo(rs.getString(2));
+                aux.setPlaca_vehiculo(crypto.decrypt(rs.getString(2)));
                 aux.setPropietario(rs.getInt(3));
                 authorizedUser.add(aux);
             }
@@ -258,7 +259,7 @@ public final class database {
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                placas.add(rs.getString(1));
+                placas.add(crypto.decrypt(rs.getString(1)));
             }
         } catch (SQLException e) {
             System.out.println("Error al consultar las placas registradas " + e.getMessage());
@@ -276,7 +277,7 @@ public final class database {
             while (rs.next()) {
                 persona_vehiculo aux = new persona_vehiculo();
                 aux.setId_persona(rs.getString(1));
-                aux.setPlaca_vehiculo(rs.getString(2));
+                aux.setPlaca_vehiculo(crypto.decrypt(rs.getString(2)));
                 aux.setPropietario(rs.getInt(3));
                 ids.add(aux);
             }
@@ -297,14 +298,14 @@ public final class database {
             ps.setString(2, veh.getModelo_vehiculo());
             ps.setString(3, veh.getColor_vehiculo());
             ps.setString(4, veh.getDescripcion_vehiculo());
-            ps.setString(5, veh.getPlaca_vehiculo());
+            ps.setString(5, crypto.encrypt(veh.getPlaca_vehiculo()));
             int res1 = ps.executeUpdate();
             if (res1 == 1) {
                 update1 = true;
             }
             sql = "DELETE PERSONA_VEHICULO WHERE PLACA_VEHICULO = ? AND PROPIETARIO = 0";
             ps = con.prepareStatement(sql);
-            ps.setString(1, veh.getPlaca_vehiculo());
+            ps.setString(1, crypto.encrypt(veh.getPlaca_vehiculo()));
             ps.executeUpdate();
             int res3 = 0;
             if (autorized.size() > 1) {
@@ -314,7 +315,7 @@ public final class database {
                         if (x.getPropietario() == 0) {
                             PreparedStatement ps2 = con.prepareStatement(sql2);
                             ps2.setString(1, x.getId_persona());
-                            ps2.setString(2, x.getPlaca_vehiculo());
+                            ps2.setString(2, crypto.encrypt(x.getPlaca_vehiculo()));
                             ps2.setInt(3, x.getPropietario());
                             res3 = ps2.executeUpdate();
                         }
@@ -341,11 +342,11 @@ public final class database {
         String sql = "DELETE PERSONA_VEHICULO WHERE PLACA_VEHICULO = ?";
         try{
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, placa);
+            ps.setString(1, crypto.encrypt(placa));
             ps.executeQuery();
             sql = "DELETE VEHICULO WHERE PLACA_VEHICULO=?";
             ps = con.prepareStatement(sql);
-            ps.setString(1, placa);
+            ps.setString(1, crypto.encrypt(placa));
             ps.executeQuery();
             return true;
                     
