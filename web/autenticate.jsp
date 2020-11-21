@@ -229,7 +229,7 @@
 
     <div id="modalEliminar" class="modal">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            <span class="close-modal" onclick="closemodal()">&times;</span>
             <p>¿Está seguro de eliminar este vehículo?</p>
             <input type="button" onclick="confirm_delete()" value="Confirmar"/>
             <input type="button" onclick="closemodal()" value="Cancelar"/>
@@ -457,6 +457,14 @@
         console.log("test");
         location.href="upload_data.jsp?data="+placa_aux;
     }
+    function closemodal(){
+        document.getElementById("modalEliminar").style.display = "none";
+    }
+    window.onclick = function (event){
+        if(event.target===document.getElementById("modalEliminar")){
+            closemodal();
+        }
+    }
     function vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV) {
         document.getElementById("crud").value = "2";
         authorized_users = [];
@@ -503,7 +511,7 @@
             }
         }
     }
-
+    
     function refrescar() {
         window.open("autenticate.jsp", "_self");
     }
