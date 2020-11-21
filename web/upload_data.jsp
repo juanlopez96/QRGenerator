@@ -50,7 +50,7 @@
                 db.connect();
 
                 if (request.getParameter("crud").equals("1")) {
-                    System.out.println("1");
+                  
                     if (db.insertVehicle(veh, authorized)) {
         %> <script>alert("Se ha añadido un vehículo correctamente");</script><%
             out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
@@ -59,7 +59,7 @@
                 out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
             }
         } else if (request.getParameter("crud").equals("2")) {
-        %> <script>alert("Modificar");</script><%
+       
             if (db.updateVehicle(veh, authorized)) {
         %> <script>alert("Se ha modificado un vehículo correctamente" );</script><%
             out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
