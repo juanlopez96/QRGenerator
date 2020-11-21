@@ -20,40 +20,69 @@
     </head>
     <body>
         <%
-            String id = (String) session.getAttribute("id");
-            String placa = request.getParameter("placa");
-            String marca = request.getParameter("marca");
-            String tipo = request.getParameter("tipo");
-            String modelo = request.getParameter("modelo");
-            String color = request.getParameter("color");
-            String descripcion = request.getParameter("descripcion");
-            if (descripcion.isEmpty()) {
-                descripcion = "Ninguna";
-            }
-            ArrayList<persona_vehiculo> authorized = new ArrayList();
-            authorized.add(new persona_vehiculo(id, placa, 1));
-            String[] autho = (request.getParameterValues("all_authorized_users"));
-            String[] spl_autho = autho[0].split(",");
-            List<String> auhorized_person = new ArrayList(Arrays.asList(spl_autho));
-            auhorized_person.removeAll(Arrays.asList("", null));
-            System.out.println(autho.length);
+            if (request.getParameter("data") == null) {
+                String id = (String) session.getAttribute("id");
+                String placa = request.getParameter("placa");
+                String marca = request.getParameter("marca");
+                String tipo = request.getParameter("tipo");
+                String modelo = request.getParameter("modelo");
+                String color = request.getParameter("color");
 
-            for (String x : auhorized_person) {
-                System.out.println(x);
-                authorized.add(new persona_vehiculo(x, placa, 0));
-            }
+                String descripcion = request.getParameter("descripcion");
+                if (descripcion.isEmpty()) {
+                    descripcion = "Ninguna";
+                }
+                ArrayList<persona_vehiculo> authorized = new ArrayList();
+                authorized.add(new persona_vehiculo(id, placa, 1));
+                String[] autho = (request.getParameterValues("all_authorized_users"));
+                String[] spl_autho = autho[0].split(",");
+                List<String> auhorized_person = new ArrayList(Arrays.asList(spl_autho));
+                auhorized_person.removeAll(Arrays.asList("", null));
 
-            vehicle veh = new vehicle(placa, marca, tipo, modelo, color, descripcion);
-            database db = new database();
-            db.connect();
-            if (db.insertVehicle(veh, authorized)) {
-        %> <script>alert("Se ha añadido un vehículo correctamente");</script><%
+                for (String x : auhorized_person) {
+                    System.out.println(x);
+                    authorized.add(new persona_vehiculo(x, placa, 0));
+                }
+
+                vehicle veh = new vehicle(placa, marca, tipo, modelo, color, descripcion);
+
+                database db = new database();
+                db.connect();
+
+                if (request.getParameter("crud").equals("1")) {
+                    System.out.println("1");
+                    if (db.insertVehicle(veh, authorized)) {
+        %> <script>alert("Se ha añadido un vehículo correctamente" + "<%=request.getParameter("crud")%>");</script><%
             out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
         } else {
-        %> <script>alert("Ha ocurrido un error");</script><%
+        %> <script>alert("Ha ocurrido un error" + "<%=request.getParameter("crud")%>");</script><%
+                out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
+            }
+        } else if (request.getParameter("crud").equals("2")) {
+        %> <script>alert("Modificar");</script><%
+            if (db.updateVehicle(veh, authorized)) {
+        %> <script>alert("Se ha añadido un vehículo correctamente" + "<%=request.getParameter("crud")%>");</script><%
             out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
-     }
-     db.disconnect();
+        } else {
+        %> <script>alert("Ha ocurrido un error" + "<%=request.getParameter("crud")%>");</script><%
+                out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
+            }
+
+        } 
+                db.disconnect();
+            }else{
+            database db = new database();
+            db.connect();
+            if (db.deleteVehicle(request.getParameter("data"))) {
+        %> <script>alert("Se ha eliminado un vehículo correctamente");</script><%
+            out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
+        } else {
+        %> <script>alert("Ha ocurrido un error en la eliminacion");</script><%
+                out.println("<meta http-equiv='refresh' content='0;URL=autenticate.jsp'>");
+            }
+            db.disconnect();
+        
+}
         %>
 
     </body>

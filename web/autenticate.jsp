@@ -18,7 +18,7 @@
 <jsp:include page="head.jsp" />
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/autenticate_page.js"></script>
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
 <%
     database db = new database();
     db.connect();
@@ -115,7 +115,7 @@
                     <%for (vehicle x : myvehicles) {%>
                     <tr>
                         <td onclick="vehiculoSeleccionado(<%=x.getId_tipo()%>, '<%=x.getPlaca_vehiculo()%>', '<%=x.getId_marca()%>', '<%=x.getModelo_vehiculo()%>', '<%=x.getColor_vehiculo()%>', '<%=x.getDescripcion_vehiculo()%>');"><i class="fa fa-edit"></i></td>
-                        <td onclick="delete_vehicle"><i class="fa fa-trash-o"></i></td>
+                        <td onclick="delete_vehicle('<%=x.getPlaca_vehiculo()%>')"><i class="fa fa-trash-o"></i></td>
                         <td><%=x.getPlaca_vehiculo()%></td>
                         <%Iterator iterator2 = vehicle_type.entrySet().iterator();
                             while (iterator2.hasNext()) {
@@ -217,9 +217,9 @@
 
                         <div class="w3-btn w3-padding w3-center" style="background:#00482b; padding: 7px 20px!important;" >
                             <i class="fa fa-user-plus" style="color: #ffffff""/></i>
-                        <input type="button" onclick="validate_authorization()" style="background:#00482b; color: #ffffff; border: 0; outline: none;" value="Añadir">
+                            <input type="button" onclick="validate_authorization()" style="background:#00482b; color: #ffffff; border: 0; outline: none;" value="Añadir">
                         </div>
-                        <p><button type="submit" form="vehicle_info" onclick="return add_vehicle()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Guardar &nbsp; </button></p>
+                        <p><button id="crud" name="crud" value="1" type="submit" form="vehicle_info" onclick="return add_vehicle()" class="w3-btn w3-padding w3-center" style="background:#00482b; color: #ffffff"><i class="fa fa-save"></i>&nbsp; Guardar &nbsp; </button></p>
                     </form>
                     <p><button class="w3-btn w3-padding w3-light-gray w3-center" onclick="refrescar();"><i class="fa fa-refresh"></i>&nbsp; Refrescar</button></p>
                 </div>
@@ -227,7 +227,14 @@
         </div>
     </div>
 
-
+    <div id="modalEliminar" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <p>¿Está seguro de eliminar este vehículo?</p>
+            <input type="button" onclick="confirm_delete()" value="Confirmar"/>
+            <input type="button" onclick="closemodal()" value="Cancelar"/>
+        </div>
+    </div>
     <!-- End page content -->
 </div>    
 
@@ -439,11 +446,19 @@
 
     }
     
-    function delete_vehicle() {
-        
+    function delete_vehicle( placaV) {
+        //vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV);
+        placa_aux = placaV;
+        document.getElementById("modalEliminar").style.display = "block";
+        console.log(placa_aux);
+
     }
-    
+    function confirm_delete(){
+        console.log("test");
+        location.href="upload_data.jsp?data="+placa_aux;
+    }
     function vehiculoSeleccionado(tipoV, placaV, marcaV, modeloV, colorV, descripcionV) {
+        document.getElementById("crud").value = "2";
         authorized_users = [];
         document.getElementById('vehicle_info').reset();
 
@@ -476,23 +491,32 @@
             }
         }
         var table = document.getElementById("table_user");
-        for(var i = 0; i<table.rows.length;i++){
+        for (var i = 0; i < table.rows.length; i++) {
             table.deleteRow(i);
         }
         if (showAllAuthoByPlaca.length > 0) {
             for (var i = 0; i < showAllAuthoByPlaca.length; i++) {
                 var newRow = table.insertRow(-1);
                 var newCell = newRow.insertCell(-1);
-                newCell.innerHTML = showAllAuthoByPlaca[i] +"  <td><i class='fa fa-trash-o'></i></td>" ;
+                newCell.innerHTML = showAllAuthoByPlaca[i] + "<td><i onclick='deleteAutho(this)' class='fa fa-trash-o'></i></td>";
                 authorized_users.push(showAllAuthoByPlaca[i]);
             }
         }
     }
-    
+
     function refrescar() {
         window.open("autenticate.jsp", "_self");
     }
-
+    function deleteAutho(btn) {
+        var row = btn.parentNode.parentNode;
+        var id = btn.parentNode.innerHTML.substring(0, 10);
+        row.parentNode.removeChild(row);
+        for (var i = 0; i < authorized_users.length; i++) {
+            if (id === authorized_users[i]) {
+                authorized_users.splice(i, 1);
+            }
+        }
+    }
     function generarQR() {
         var myvehicles = false;
         var authorized = false;

@@ -215,7 +215,7 @@ public final class database {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 vehicle aux = new vehicle();
                 aux.setPlaca_vehiculo(rs.getString(1));
                 aux.setId_marca(rs.getString(2));
@@ -230,10 +230,10 @@ public final class database {
         }
         return myvehicles;
     }
-    
-    public ArrayList<persona_vehiculo> getAuthorizedUser(String id){
+
+    public ArrayList<persona_vehiculo> getAuthorizedUser(String id) {
         ArrayList<persona_vehiculo> authorizedUser = new ArrayList<>();
-        try{
+        try {
             String sql = "SELECT * FROM PERSONA_VEHICULO WHERE ID_PERSONA = ? AND PROPIETARIO=0";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, id);
@@ -245,45 +245,114 @@ public final class database {
                 aux.setPropietario(rs.getInt(3));
                 authorizedUser.add(aux);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Error al momento de consultar los vehiculos autorizados " + e.getMessage());
         }
         return authorizedUser;
     }
-    
-    public ArrayList<String> getAllVehicles(){
+
+    public ArrayList<String> getAllVehicles() {
         ArrayList<String> placas = new ArrayList<>();
-        try{
+        try {
             String sql = "SELECT PERSONA_VEHICULO.PLACA_VEHICULO FROM PERSONA_VEHICULO";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 placas.add(rs.getString(1));
             }
-        }catch(SQLException e){
-            System.out.println("Error al consultar las placas registradas "+ e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("Error al consultar las placas registradas " + e.getMessage());
         }
         return placas;
     }
-    
-    public ArrayList<persona_vehiculo> getAllAthorized(){
+
+    public ArrayList<persona_vehiculo> getAllAthorized() {
         ArrayList<persona_vehiculo> ids = new ArrayList();
-        
-        try{
+
+        try {
             String sql = "SELECT * FROM PERSONA_VEHICULO";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 persona_vehiculo aux = new persona_vehiculo();
                 aux.setId_persona(rs.getString(1));
                 aux.setPlaca_vehiculo(rs.getString(2));
                 aux.setPropietario(rs.getInt(3));
                 ids.add(aux);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Hubo un error al consultar las personas que autoricé en mi vehiculo " + e.getMessage());
         }
         return ids;
-    } 
-            
+    }
+
+    public boolean updateVehicle(vehicle veh, ArrayList<persona_vehiculo> autorized) {
+        boolean update1 = false;
+        boolean update2 = false;
+        try {
+            String sql = "UPDATE VEHICULO SET ID_MARCA = ?, MODELO_VEHICULO=?, COLOR_VEHICULO=?, DESCRIPCION_VEHICULO = ?"
+                    + " WHERE PLACA_VEHICULO = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, veh.getId_marca());
+            ps.setString(2, veh.getModelo_vehiculo());
+            ps.setString(3, veh.getColor_vehiculo());
+            ps.setString(4, veh.getDescripcion_vehiculo());
+            ps.setString(5, veh.getPlaca_vehiculo());
+            int res1 = ps.executeUpdate();
+            if (res1 == 1) {
+                update1 = true;
+            }
+            sql = "DELETE PERSONA_VEHICULO WHERE PLACA_VEHICULO = ? AND PROPIETARIO = 0";
+            ps = con.prepareStatement(sql);
+            ps.setString(1, veh.getPlaca_vehiculo());
+            ps.executeUpdate();
+            int res3 = 0;
+            if (autorized.size() > 1) {
+                for (persona_vehiculo x : autorized) {
+                    String sql2 = "INSERT INTO PERSONA_VEHICULO VALUES (?,?,?)";
+                    try {
+                        if (x.getPropietario() == 0) {
+                            PreparedStatement ps2 = con.prepareStatement(sql2);
+                            ps2.setString(1, x.getId_persona());
+                            ps2.setString(2, x.getPlaca_vehiculo());
+                            ps2.setInt(3, x.getPropietario());
+                            res3 = ps2.executeUpdate();
+                        }
+                    } catch (SQLException e) {
+                        System.out.println("Algo salio mal al insertar nuevamente el persona vehiculo " + e.getMessage());
+                        update2 = false;
+                    }
+                }
+            }else{
+                res3 = 1;
+            }
+            if (res3 == 1) {
+                update2 = true;
+            }
+
+        } catch (Exception e) {
+            update1 = false;
+            update2 = false;
+        }
+        return update1 && update2;
+    }
+
+    public boolean deleteVehicle(String placa) {
+        String sql = "DELETE PERSONA_VEHICULO WHERE PLACA_VEHICULO = ?";
+        try{
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, placa);
+            ps.executeQuery();
+            sql = "DELETE VEHICULO WHERE PLACA_VEHICULO=?";
+            ps = con.prepareStatement(sql);
+            ps.setString(1, placa);
+            ps.executeQuery();
+            return true;
+                    
+        }catch(Exception e){
+            System.out.println("Algo salio mal a la hora de eliminar vehiculo " + e.getMessage());
+            return false;
+        }
+    }
+
 }
