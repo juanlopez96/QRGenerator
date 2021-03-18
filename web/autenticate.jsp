@@ -127,7 +127,9 @@
                             for (marca_vehiculo marca : marcas) {
                                 if (marca.getId_marca().equals(x.getId_marca())) {%>
                         <td><%=marca.getNombre_marca()%></td>
-                        <%      }
+                        <%      
+                            break;
+                            }
                             }
                         %>
                         <td><%=x.getModelo_vehiculo()%></td>
