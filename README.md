@@ -7,4 +7,4 @@ Autores:
 - Yeiny Paola Calderón Portela
 - Yessica Alexandra Malaver Gómez
 - Leonardo Gómez Sarmiento
-- Juan Camilo López Ochoa
+- Juan Camilo López Ochoa  
